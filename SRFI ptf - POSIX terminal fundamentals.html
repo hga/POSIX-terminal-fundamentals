@@ -69,7 +69,7 @@ it?
 
 <h2>Specification</h2>
 
-<h4>~~~FIX_ME</h4>
+<h4>Miscellaneous procedures</h4>
 
 <!--<code>(foreign-error? <i>object</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>boolean</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)
 <blockquote>
@@ -82,11 +82,25 @@ Returns #f unless <i>object</i> is a SRFI 198 error.
 </pre>
 </blockquote> -->
 
+<code>(terminal-file-name <i>port</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>boolean</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>ttyname()</code>
+<blockquote>
+<p>
+The argument <i>port</i> must be open on a terminal.
+Returns the file name of the terminal.
+</p>
+<pre class="example">
+(terminal-file-name &lt;~~~FIX_ME&gt;) &rArr; ~~~FIX_ME
+(terminal-file-name &lt;~~~FIX_ME&gt;) &rArr; ~~~FIX_ME
+</pre>
+</blockquote>
 
-<h4>Serial line manipulatio</h4>
+
+<h4>Serial line manipulation</h4>
 
 
 <h4>Safe terminal I/O primitives</h4>
+
+
 
 
 
