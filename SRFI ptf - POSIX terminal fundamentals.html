@@ -121,10 +121,13 @@ the <code>stty</code> command.
 </p>
 
 <p>
-The general paradigm for using them is to set up your application,
-then run it in the <code><i>proc</i></code> provided to them, a
-procedure that takes the same port arguments in the same order as the
+The general paradigm for using <code>with-raw-mode</code>
+and <code>with-rare-mode</code> is to set up your application, then
+run it in the <code><i>proc</i></code> provided to them, a procedure
+that takes the same port arguments in the same order as the
 containing <code>with-</code> or <code>without-</code> procedure.
+When inside <code><i>proc</i></code>, <code>with-cooked-mode</code>
+can be used for a termporarily escape, for instance to a shell.
 The <code>without-echo</code> procedure is an exception in that it's
 generally used to enter a password or passphrase.  The procedures
 return the values that <code><i>proc</i></code> returns.
@@ -157,13 +160,33 @@ of <code>proc</code>.
 <blockquote>
 <p>
 The port arguments must be opened on a terminal.
-The terminal is set to "rare", also known as cbreak mode during the dynamic
-execution of <code>proc</code>, and then is restored to canonical "cooked" mode.
+The terminal is set to "rare", also known as cbreak mode during the
+dynamic execution of <code>proc</code>, and then is restored to
+canonical "cooked" mode.
 Just as in canonical mode, any read operation on the terminal
 will wait until characters are received, unlike raw mode.
 However, no characters are given special interpretation except
 the characters that send signals (by default, Ctrl-C and Ctrl-\).
-Echoing of input is disabled on the terminal during the execution of <code>proc</code>.
+Echoing of input is disabled on the terminal during the execution
+of <code>proc</code>.
+</p>
+<pre class="example">
+~~~FIX_ME example
+</pre>
+</blockquote>
+
+<code>(with-cooked-mode <i>input-port output-port proc</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>[values]</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>stty ~~~FIX_ME</code>
+<blockquote>
+<p>
+The port arguments must be opened on a terminal.
+The terminal is set to canonical "cooked" during the dynamic execution
+of <code>proc</code>, and then is restored to the previous mode.
+In canonical mode, any read operation on the terminal will wait until
+characters are received, and no characters are given special
+interpretation.
+The characters that send signals (by default, Ctrl-C and Ctrl-\) may
+well terminate the instance of Scheme you are using, so it is wise to
+quickly switch to a subprocess such as a shell.
 </p>
 <pre class="example">
 ~~~FIX_ME example
