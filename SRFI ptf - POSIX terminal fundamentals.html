@@ -48,7 +48,7 @@ other standards which this proposal will replace or with which it will
 compete, please explain why the present proposal is a substantial
 improvement.
 
-
+<p>
 P<small>OSIX</small> provides a complete set of routines for
 manipulating terminal devices &mdash; putting them in "raw" mode,
 changing and querying their special characters, modifying their I/O
@@ -56,16 +56,20 @@ speeds, and so forth.  However, now that terminal emulators have
 almost completely displaced terminals, very little of this is useful
 except for directly controlling serial-line hardware, which is still
 widely used for embedded programming.  This SRFI provides useful
-serial line procedures, and high level safe wrapper for use by
+serial line procedures, and high level safe wrappers for use by
 command-line programs.
-
+A future SRFI may provide a package suitable for writing textual user
+interfaces along the lines of ncurses, but hopefully much simpler.
+</p>
+<p>
 Once you go to the trouble of implementing the with-* and without-echo
 procedures, including serial terminal control ones is not much extra
 work given Chibi Scheme sample implementation provided.
-
+</p>
+<p>
 The one SRFI 170 terminal function left.  Mention this is a spin-off of
 it?
-
+</p>
 
 <h2>Specification</h2>
 
@@ -97,15 +101,93 @@ Returns the file name of the terminal.
 
 <h4>Serial line manipulation</h4>
 
+<p>
+~~~FIX_ME
+</p>
 
 <h4>Safe terminal I/O primitives</h4>
 
+<p>
+The following procedures use <code>dynamic-wind</code> when executing
+their <code><i>proc</i></code> procedure argument.
+If <i><code>proc</code>'s</i> dynamic extent is escaped, the terminal
+mode changes of the containing <code>with-</code>
+or <code>without-</code> procedure are undone, but if
+<i><code>proc</code>'s</i> dynamic extent is re-entered, the terminal
+mode changes of the containing procedure are restored to their
+previous state.  They all use P<small>OSIX</small>
+<code>tcgetattr()</code> and <code>tcsetattr()</code>; see also
+the <code>stty</code> command.
+</p>
 
+<p>
+The general paradigm for using them is to set up your application,
+then run it in the <code><i>proc</i></code> provided to them, a
+procedure that takes the same port arguments in the same order as the
+containing <code>with-</code> or <code>without-</code> procedure.
+The <code>without-echo</code> procedure is an exception in that it's
+generally used to enter a password or passphrase.  The procedures
+return the values that <code><i>proc</i></code> returns.
+</p>
 
+<code>(with-raw-mode <i>input-port output-port min time proc</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>[values]</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>stty -ECHO -ICANON -IEXTEN -ISIG -BRKINT -ICRNL -INPCK -ISTRIP -IXON -CSIZE -PARENB CS8 -OPOST VMIN=<i>min</i> VTIME=<i>time</i></code>
+<blockquote>
+<p>
+The port arguments must be opened on a terminal.
+The terminal is set to raw mode during the dynamic execution of <code>proc</code>
+and then is restored to canonical "cooked" mode.
+The effect of the <i>min</i> and <i>time</i> arguments is that any
+reads done on the terminal while raw mode is in effect will return to
+the caller after <i>min</i> bytes have been read or <i>time</i>
+deciseconds (1/10ths of a second) have elapsed, whichever comes first.
+Therefore, it makes no sense to use any read operation on the terminal
+except <code>read-char</code> or <code>read-string</code>,
+which read a fixed number of characters.
+No character is given special handling; all are passed to the
+application exactly as received.
+Echoing of input is disabled on the terminal during the execution
+of <code>proc</code>.
+</p>
+<pre class="example">
+~~~FIX_ME example
+</pre>
+</blockquote>
+
+<code>(with-rare-mode <i>input-port output-port proc</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>[values]</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>stty -ICANON -ECHO VMIN=1 VTIME=0</code>
+<blockquote>
+<p>
+The port arguments must be opened on a terminal.
+The terminal is set to "rare", also known as cbreak mode during the dynamic
+execution of <code>proc</code>, and then is restored to canonical "cooked" mode.
+Just as in canonical mode, any read operation on the terminal
+will wait until characters are received, unlike raw mode.
+However, no characters are given special interpretation except
+the characters that send signals (by default, Ctrl-C and Ctrl-\).
+Echoing of input is disabled on the terminal during the execution of <code>proc</code>.
+</p>
+<pre class="example">
+~~~FIX_ME example
+</pre>
+</blockquote>
+
+<code>(without-echo <i>input-port output-port proc</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>[values]</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>stty -ECHO -ECHOE -ECHOK -ECHONL</code>&nbsp;
+<blockquote>
+<p>
+The port arguments must be opened on a terminal.
+Echoing of input is disabled on the terminal during the execution of <code>proc</code>
+and then is re-enabled.
+</p>
+<pre class="example">
+~~~FIX_ME example
+</pre>
+</blockquote>
 
 
 <h2>Implementation</h2>
 
+<p>
+~~~FIX_ME
+</p>
 
 
 <h2>Acknowledgments</h2>
