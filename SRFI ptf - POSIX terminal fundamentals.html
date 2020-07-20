@@ -9,23 +9,29 @@
   <body>
     <h1><a href="https://srfi.schemers.org/"><img class="srfi-logo" src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI logo" /></a>###: ???title???</h1>
 
-<p>by ???author(s)???</p>
+<p>
+by John Cowan (architect and author) and Harold Ancell (editor)
+</p>
+
 
 <h2>Status</h2>
 
-??? the draft/final/withdrawn status of the SRFI, information on how
-to subscribe to its mailing list, and important dates in its history.
-The editor will add this section.
+
 
 <h2>Abstract</h2>
 
-??? abstract, preferably shorter than 200 words.  Please outline the
-need for, and design of, the proposal.
+<p>
+A set of procedures to support command line and terminal interface
+programs, and serial interfaces to embedded and the like hardware.
+</p>
+
 
 <h2>Issues</h2>
 
-??? Optional section that may point out things to be resolved.  This
-will not appear in the final SRFI.
+<p>
+Whether to include with-cooked-mode, including how safely it can be
+done.
+</p>
 
 <h2>Rationale</h2>
 
@@ -37,26 +43,43 @@ other standards which this proposal will replace or with which it will
 compete, please explain why the present proposal is a substantial
 improvement.
 
+
+P<small>OSIX</small> provides a complete set of routines for
+manipulating terminal devices &mdash; putting them in "raw" mode,
+changing and querying their special characters, modifying their I/O
+speeds, and so forth.  However, now that terminal emulators have
+almost completely displaced terminals, very little of this is useful
+except for directly controlling serial-line hardware, which is still
+widely used for embedded programming.  This SRFI provides useful
+serial line procedures, and high level safe wrapper for use by
+command-line programs.
+
+Once you go to the trouble of implementing the with-* and without-echo
+procedures, including serial terminal control ones is not much extra
+work given Chibi Scheme sample implementation provided.
+
+The one SRFI 170 terminal function left.  Mention this is a spin-off of
+it?
+
+
 <h2>Specification</h2>
 
-??? detailed specification.  This should be detailed enough that a
-conforming implementation could be completely created from this
-description.
+
 
 <h2>Implementation</h2>
 
-??? explanation of how it meets the sample implementation
-requirement (see <a href="srfi-process.html">process</a>), and the
-code, if possible, or a link to it
 
-<a href="srfi minus ???-sample.scm">Source for the sample implementation.</a>
 
-<h2>Acknowledgements</h2>
+<h2>Acknowledgments</h2>
 
-??? credit where it is due
+<p>
+John Cowan conceived the with-* and without-echo procedures,
+particularly their operating paradigm which minimizes the risk of
+leaving a terminal in an odd, often non-echoing state.
+</p>
 
 <h2>Copyright</h2>
-<p>Copyright &copy; ??? (201?).</p>
+<p>Copyright &copy; (2020) John Cowan and Harold Ancell.</p>
 
 <p>
   Permission is hereby granted, free of charge, to any person
