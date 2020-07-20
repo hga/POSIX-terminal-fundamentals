@@ -21,8 +21,10 @@ by John Cowan (architect and author) and Harold Ancell (author and editor)
 <h2>Abstract</h2>
 
 <p>
-A set of procedures to support command line and terminal interface
-programs, and serial interfaces to embedded and the like hardware.
+Procedures to support safely changing terminal modes, such as cooked
+to raw, for command line and terminal interface programs, and serial
+line device manipulation for embedded and the like hardware
+interfacing.
 </p>
 
 
@@ -33,7 +35,7 @@ programs, and serial interfaces to embedded and the like hardware.
 How to prescribe and/or enforce safe use of with-cooked-mode.
 </p></li>
 <li><p>
-Whether to include serial line procedures in this or a seperate SRFI.
+Whether to include serial line procedures in this, or a seperate SRFI.
 </p></li>
 </ul>
 
@@ -52,19 +54,23 @@ improvement.
 P<small>OSIX</small> provides a complete set of routines for
 manipulating terminal devices &mdash; putting them in "raw" mode,
 changing and querying their special characters, modifying their I/O
-speeds, and so forth.  However, now that terminal emulators have
-almost completely displaced terminals, very little of this is useful
-except for directly controlling serial-line hardware, which is still
-widely used for embedded programming.  This SRFI provides useful
-serial line procedures, and high level safe wrappers for use by
-command-line programs.
-A future SRFI may provide a package suitable for writing textual user
-interfaces along the lines of ncurses, but hopefully much simpler.
+speeds, and so forth.
+Now that terminal emulators have almost completely displaced
+terminals, very little of this is useful except for directly
+controlling serial-line hardware, which is still widely used for
+embedded programming and applications.
 </p>
 <p>
-Once you go to the trouble of implementing the with-* and without-echo
-procedures, including serial terminal control ones is not much extra
-work given Chibi Scheme sample implementation provided.
+This SRFI provides safe high level wrappers for using raw, no echo
+etc. terminal modes. for use by command-line programs and texual user
+interfaces, and relevant serial line manipulation procedures such as
+setting the baud rate.
+</p>
+<p>
+These two disparate use cases are bundled together in one SRFI because
+the complicated low level infrastructure for implementing either is
+roughtly the same, except for different sets of constants, which are
+presumebly cheap to impliment.
 </p>
 <p>
 The one SRFI 170 terminal function left.  Mention this is a spin-off of
