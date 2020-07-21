@@ -10,7 +10,7 @@
     <h1><a href="https://srfi.schemers.org/"><img class="srfi-logo" src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI logo" /></a>###: POSIX Terminal Fundamentals</h1>
 
 <p>
-by John Cowan (architect and author) and Harold Ancell (author and editor)
+by John Cowan (author) and Harold Ancell (author and editor)
 </p>
 
 
@@ -21,10 +21,10 @@ by John Cowan (architect and author) and Harold Ancell (author and editor)
 <h2>Abstract</h2>
 
 <p>
-Procedures to support safely changing terminal modes, such as cooked
-to raw, for command line and terminal interface programs, and serial
-line device manipulation for embedded and the like hardware
-interfacing.
+Procedures for command line and terminal interface programs to support
+safely changing and resetting terminal modes, such as cooked to raw
+and back, and serial line device manipulation for embedded and the
+like hardware interfacing.
 </p>
 
 
@@ -35,20 +35,16 @@ interfacing.
 How to prescribe and/or enforce safe use of <code>with-cooked-mode</code>.
 </p></li>
 <li><p>
-Whether to include serial line procedures in this, or a seperate SRFI.
+Whether to include serial line procedures in this, or a separate SRFI.
+</p></li>
+<li><p>
+Whether to support <code>stty(1)</code> style getting and setting of
+all of a special device's modes.
 </p></li>
 </ul>
 
 
 <h2>Rationale</h2>
-
-??? detailed rationale.  This should be 200-500 words long.  Please
-explain why the proposal should be incorporated as a standard feature
-in Scheme implementations.  List related standards and SRFIs,
-including dependencies, conflicts, and replacements.  If there are
-other standards which this proposal will replace or with which it will
-compete, please explain why the present proposal is a substantial
-improvement.
 
 <p>
 P<small>OSIX</small> provides a complete set of routines for
@@ -61,55 +57,78 @@ controlling serial-line hardware, which is still widely used for
 embedded programming and applications.
 </p>
 <p>
-This SRFI provides safe high level wrappers for using raw, no echo
-etc. terminal modes. for use by command-line programs and texual user
-interfaces, and relevant serial line manipulation procedures such as
-setting the baud rate.
+This SRFI provides safe high level wrappers for raw, no echo etc.
+terminal modes for use by command-line programs and textual user
+interfaces, and a procedure to set a serial line's characteristics
+such as its baud rate.
 </p>
 <p>
 These two disparate use cases are bundled together in one SRFI because
 the complicated low level infrastructure for implementing either is
-roughtly the same, except for different sets of constants, which are
-presumebly cheap to impliment.
+roughly the same, except for different sets of constants, which are
+presumably cheap to implement.
 </p>
 <p>
-The one SRFI 170 terminal function left.  Mention this is a spin-off of
-it?
+This SRFI depends on SRFI 198, Foreign Interface Error Handling.
+Various procedures in SRFI 170, from which it was forked off of, may
+be useful in concert with it.
 </p>
+
 
 <h2>Specification</h2>
 
 <h3>Error handling</h3>
 
 <p>
-The procedures of this SRFI signal an exception
-when the underlying system calls fail, as documented in
+The procedures of this SRFI signal an exception when the underlying
+system calls fail, as documented in
 <a href="https://srfi.schemers.org/srfi-198/srfi-198.html">SRFI 198</a>.
 The failure of system calls is in the <code>'errno</code> collection
 of <code>error-set</code>, and sanity checks before they are called
 are in <code>'error</code>.
 </p>
 
+
 <h3>Miscellaneous procedures</h3>
 
-<code>(terminal-file-name <i>port</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>boolean</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>ttyname()</code>
+<p>See also the <code>terminal?</code> procedure in
+<a href="https://srfi.schemers.org/srfi-170/srfi-170.html">SRFI 170</a>,
+which returns <code>#t</code> if the supplied port argument is a terminal.
+</p>
+
+<code>(terminal-file-name <i>port</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>ttyname()</code>
 <blockquote>
 <p>
 The argument <i>port</i> must be open on a terminal.
 Returns the file name of the terminal.
 </p>
 <pre class="example">
-(terminal-file-name (current-input-port)) &rArr; #t
-(terminal-file-name &lt;a-string-port&gt;) &rArr; #f
+(terminal-file-name &lt;a-serial-line-port&gt;) &rArr; "/dev/ttyS0"
 </pre>
 </blockquote>
 
 
 <h3>Serial line manipulation</h3>
 
+<code>(stty <i>port . args</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>undefined</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>tcgetattr(), tcsetattr()</code>
+<blockquote>
 <p>
-<code>(stty <i>args</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>undefined</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>tcgetattr(), tcsetattr()</code>
+Use in the manner of P<small>OSIX</small> <code>stty(1)</code>, as
+extended to allow specifying the special device file to be
+manipulated, here as associated to a port.
 </p>
+<p>
+</p>
+The supported arguments are:
+<p>
+</p>
+[<i>To be determined.</i>]
+<p>
+<pre class="example">
+(stty &lt;port-for-a-serial-device&gt; 9600) &rArr; <i>undefined</i>, sets baud rate to 9600.
+</pre>
+</blockquote>
+
 
 <h3>Safe terminal I/O primitives</h3>
 
@@ -133,7 +152,7 @@ run it in the <code><i>proc</i></code> provided to them, a procedure
 that takes the same port arguments in the same order as the
 containing <code>with-</code> or <code>without-</code> procedure.
 When inside <code><i>proc</i></code>, <code>with-cooked-mode</code>
-can be used for a termporarily escape, for instance to a shell.
+can be used for a temporarily escape, for instance to a shell.
 The <code>without-echo</code> procedure is an exception in that it's
 generally used to enter a password or passphrase.  The procedures
 return the values that <code><i>proc</i></code> returns.
@@ -158,7 +177,9 @@ Echoing of input is disabled on the terminal during the execution
 of <code>proc</code>.
 </p>
 <pre class="example">
-~~~FIX_ME example
+(with-raw-mode (current-input-port) (current-output-port)
+               2 50
+               (lambda (x y) (read-char) (read-char))) &rArr; #\x03
 </pre>
 </blockquote>
 
@@ -177,7 +198,8 @@ Echoing of input is disabled on the terminal during the execution
 of <code>proc</code>.
 </p>
 <pre class="example">
-~~~FIX_ME example
+(with-rare-mode (current-input-port) (current-output-port)
+                (lambda (x y) (read-char))) &rArr; #\newline
 </pre>
 </blockquote>
 
@@ -195,7 +217,7 @@ well terminate the instance of Scheme you are using, so it is wise to
 quickly switch to a subprocess such as a shell.
 </p>
 <pre class="example">
-~~~FIX_ME example
+~~~FIX_ME add example
 </pre>
 </blockquote>
 
@@ -207,7 +229,8 @@ Echoing of input is disabled on the terminal during the execution of <code>proc<
 and then is re-enabled.
 </p>
 <pre class="example">
-~~~FIX_ME example
+(without-echo (current-input-port) (current-output-port)
+              (lambda (x) (read-string 8 (current-input-port)))) &rArr; "12345678"
 </pre>
 </blockquote>
 
@@ -215,18 +238,21 @@ and then is re-enabled.
 <h2>Implementation</h2>
 
 <p>
-~~~FIX_ME
+A Chibi Scheme sample implementation will be created after the API
+settles down.
 </p>
 
 
 <h2>Acknowledgments</h2>
 
+<!--
 <p>
-John Cowan conceived the <code>with-*</code>
+[~~~FIX_ME-after-research conceived the <code>with-*</code>
 and <code>without-echo</code> procedures, particularly their operating
 paradigm which minimizes the classic risk of leaving a terminal in an
 odd, often non-echoing state.
 </p>
+-->
 
 <h2>Copyright</h2>
 <p>Copyright &copy; (2020) John Cowan and Harold Ancell.</p>
