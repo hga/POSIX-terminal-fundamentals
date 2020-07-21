@@ -1,3 +1,7 @@
+For each new SRFI:
+
+ * gzip before attaching to email to avoid end of line conversion
+
 For each release:
 
  * Fix errors reported by W3C HTML Validator.
