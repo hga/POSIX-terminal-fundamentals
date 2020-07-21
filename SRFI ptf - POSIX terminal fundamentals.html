@@ -79,18 +79,18 @@ it?
 
 <h2>Specification</h2>
 
-<h4>Miscellaneous procedures</h4>
+<h3>Error handling</h3>
 
-<!--<code>(foreign-error? <i>object</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>boolean</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)
-<blockquote>
 <p>
-Returns #f unless <i>object</i> is a SRFI 198 error.
+The procedures of this SRFI signal an exception
+when the underlying system calls fail, as documented in
+<a href="https://srfi.schemers.org/srfi-198/srfi-198.html">SRFI 198</a>.
+The failure of system calls is in the <code>'errno</code> collection
+of <code>error-set</code>, and sanity checks before they are called
+are in <code>'error</code>.
 </p>
-<pre class="example">
-(foreign-error? "This is not an foreign error object") &rArr; #f
-(foreign-error? (make-foreign-error &lt;valid-alist&gt;)) &rArr; #t
-</pre>
-</blockquote> -->
+
+<h3>Miscellaneous procedures</h3>
 
 <code>(terminal-file-name <i>port</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>boolean</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>ttyname()</code>
 <blockquote>
@@ -99,19 +99,19 @@ The argument <i>port</i> must be open on a terminal.
 Returns the file name of the terminal.
 </p>
 <pre class="example">
-(terminal-file-name &lt;~~~FIX_ME&gt;) &rArr; ~~~FIX_ME
-(terminal-file-name &lt;~~~FIX_ME&gt;) &rArr; ~~~FIX_ME
+(terminal-file-name (current-input-port)) &rArr; #t
+(terminal-file-name &lt;a-string-port&gt;) &rArr; #f
 </pre>
 </blockquote>
 
 
-<h4>Serial line manipulation</h4>
+<h3>Serial line manipulation</h3>
 
 <p>
 <code>(stty <i>args</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>undefined</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>tcgetattr(), tcsetattr()</code>
 </p>
 
-<h4>Safe terminal I/O primitives</h4>
+<h3>Safe terminal I/O primitives</h3>
 
 <p>
 The following procedures use <code>dynamic-wind</code> when executing
